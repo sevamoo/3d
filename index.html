@@ -121,7 +121,7 @@ var cloudMaterial = new THREE.MeshLambertMaterial({
 });
 var cloud = new THREE.Mesh(geometry, cloudMaterial);
 cloud.visible = false;
-(new THREE.TextureLoader()).load('clouds_2048.jpg', function(texture){
+(new THREE.TextureLoader()).load('road.png', function(texture){
   cloudMaterial.alphaMap = texture;
 });
 earth.add(cloud);
