@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>3D Earth with Mapbox GL, D3.js and Three.js</title>
+<style>
+html, body { margin: 0; padding: 0; overflow: hidden; }
+html { background-color: #000; color: #fff; font-family: sans-serif; }
+select { font: inherit; }
+canvas { image-rendering: crisp-edges; image-rendering: pixelated; }
+#map, #equirectangular-map { position: absolute; pointer-events: none; right: 0; opacity: 0; }
+.DEBUG #map, .DEBUG #equirectangular-map { opacity: 1; }
+#map { bottom: 0; transform: scale(.1); transform-origin: bottom right; }
+#equirectangular-map { transform: scale(.1); transform-origin: top right; }
+#options { position: absolute; top: 10px; right: 10px; z-index: 99999; text-align: right; }
+#options[hidden] { display: block; opacity: .5; pointer-events: none; }
+#options select, #options label { padding: .5em; display: inline-block; vertical-align: middle; }
+#container canvas { vertical-align: top; }
+#container > div { bottom: 0; top: auto !important; }
+footer { position: absolute; bottom: 10px; right: 10px; opacity: .75; }
+footer a { color: inherit; }
+#loader { position: absolute; left: 10px; top: 10px; animation: fade .5s infinite ease-in-out alternate; }
+@keyframes fade {
+  0% { opacity: .3 }
+  100% { opacity: 1 }
+}
+.fullscreen #options, .fullscreen footer { display: none; }
+</style>
+<div id="map"></div>
+<canvas id="equirectangular-map"></canvas>
+<div id="container"></div>
+<div id="loader">Loading&hellip;</div>
+<div id="options">
+  <select id="style-selector" onChange="generateMap(this.value)">
+    <option value="satellite" selected>Satellite</option>
+    <option value="streets">Streets</option>
+    <option value="dark">Dark</option>
+    <option value="light">Light</option>
+  </select>
+  <br>
+  <label><input type="checkbox" id="cloud-checkbox" onChange="toggleClouds(this.checked)"> Clouds</label>
+</div>
+<footer>
+  <a href="https://github.com/cheeaun/3d-earth" target="_blank">Learn more on GitHub</a>
+</footer>
+<script src="https://api.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-geo/1.6.4/d3-geo.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/87/three.min.js"></script>
+<script src="https://unpkg.com/camera-controls@0.0.6/dist/camera-controls.min.js"></script>
+<script src="https://rawgit.com/mrdoob/stats.js/master/build/stats.min.js"></script>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlZWF1biIsImEiOiJjaXhmb3o3bTEwMDAzMnRudTJuNjh1eXQ1In0.yO6WeKJwx6yIPoVx5aPavQ';
+
+var zoom = 1;
+var mapWidth = 1200 * zoom;
+var mapHeight = 1200 * zoom;
+var DEBUG = location.hash == '#DEBUG';
+
+var $map = document.getElementById('map');
+var $eMap = document.getElementById('equirectangular-map');
+var $loader = document.getElementById('loader');
+var $options = document.getElementById('options');
+
+$map.style.width = mapWidth + 'px';
+$map.style.height = mapHeight + 'px';
+
+var dpr = window.devicePixelRatio;
+var width = mapWidth * dpr;
+var height = mapHeight * dpr;
+var halfHeight = height / 2;
+
+$eMap.width = width;
+$eMap.height = halfHeight;
+
+// 3D stuff
+var container = document.getElementById('container');
+var renderer = new THREE.WebGLRenderer({
+  alpha: true,
+  antialias: true,
+  stencil: false,
+});
+renderer.setPixelRatio(dpr);
+renderer.setSize(window.innerWidth, window.innerHeight);
+// Fix "GL_ARB_gpu_shader5" bug: https://github.com/mrdoob/three.js/issues/9716
+renderer.context.getShaderInfoLog = function(){ return '' };
+container.appendChild(renderer.domElement);
+
+// Camera
+var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 2000);
+camera.position.z = 500;
+var CameraControls = cameraControlsFactory(THREE);
+var cameraControls = new CameraControls(camera, renderer.domElement);
+cameraControls.rotate(0, -1, true); // Tilt down to show North pole a bit
+cameraControls.update();
+
+// Hack cameraControls to have min & max distance
+var _dolly = cameraControls.dolly;
+cameraControls.dolly = function(distance, enableTransition){
+  var d = Math.abs(distance);
+  if (d < 18 || d > 60) return;
+  _dolly.call(cameraControls, distance, enableTransition);
+}
+
+// Scene
+var scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+
+// Earth
+var texture = new THREE.CanvasTexture($eMap);
+texture.minFilter = THREE.LinearFilter; // Fix "Textures should be of a power of two" warning
+var geometry = new THREE.SphereGeometry(200, 50, 50);
+var material = new THREE.MeshPhongMaterial({
+  overdraw: .5, // fill in the gaps between triangles
+});
+var earth = new THREE.Mesh(geometry, material);
+scene.add(earth);
+
+// Clouds
+var cloudMaterial = new THREE.MeshLambertMaterial({
+  opacity: 0.8,
+  transparent: true,
+});
+var cloud = new THREE.Mesh(geometry, cloudMaterial);
+cloud.visible = false;
+(new THREE.TextureLoader()).load('clouds_2048.jpg', function(texture){
+  cloudMaterial.alphaMap = texture;
+});
+earth.add(cloud);
+
+function toggleClouds(checked){
+  cloud.visible = checked;
+};
+
+// Stars
+var starsGeometry = new THREE.SphereGeometry(1000);
+var starsMaterial = new THREE.MeshBasicMaterial({
+  side: THREE.BackSide,
+});
+var stars = new THREE.Mesh(starsGeometry, starsMaterial);
+scene.add(stars);
+(new THREE.TextureLoader()).load('galaxystarfield.png', function(texture){
+  starsMaterial.map = texture;
+});
+
+// Light
+var light = new THREE.DirectionalLight(0xffffff);
+light.target = earth;
+scene.add(light);
+
+// Stats: https://github.com/mrdoob/stats.js
+if (DEBUG){
+  var stats = new Stats();
+  container.appendChild(stats.domElement);
+}
+
+// Stop auto-rotating earth when dragging it
+var stopRotating = false;
+container.ontouchstart = container.onmousedown = function(){
+  stopRotating = true;
+}
+container.ontouchend = container.ontouchcancel = container.onmouseup = function(){
+  stopRotating = false;
+}
+
+window.onresize = function(){
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+const clock = new THREE.Clock();
+function render(){
+  var delta = clock.getDelta();
+  cameraControls.update(delta);
+  if (!stopRotating){
+    var y = .001;
+    earth.rotation.y += y;
+    stars.rotation.y -= y/2;
+  }
+  light.position.copy(camera.position);
+  renderer.render(scene, camera);
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  render();
+  if (DEBUG) stats.update();
+}
+
+// Projections stuff
+var equirectangular = d3.geoEquirectangular()
+  .scale(width / 2 / Math.PI)
+  .translate([width / 2, height * .75]);
+var mercator = d3.geoMercator()
+  .scale(width / 2 / Math.PI)
+  .translate([width / 2, height / 2]);
+var invert = equirectangular.invert;
+
+var context = $eMap.getContext('2d', { alpha: false });
+function generateMap(style){
+  console.log('Generate map: ' + style);
+  $options.hidden = true;
+  $loader.hidden = false;
+
+  var map = new mapboxgl.Map({
+    container: 'map',
+    // optimize=true -> https://blog.mapbox.com/style-optimized-vector-tiles-39868da81275
+    style: 'mapbox://styles/mapbox/' + style + '-v9?optimize=true',
+    center: [0, 0],
+    zoom: zoom,
+    interactive: false,
+    renderWorldCopies: false,
+    attributionControl: false,
+    trackResize: false,
+    preserveDrawingBuffer: true,
+  });
+
+  map.on('load', function(){
+    var canvas = map.getCanvas();
+    var gl = canvas.getContext('webgl', { alpha: false, antialias: false });
+
+    console.log('Map loaded');
+
+    setTimeout(function(){
+      console.log('Render map start');
+      var source = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4);
+      gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, source);
+      var sourceData = new Uint8ClampedArray(source.buffer);
+      var targetData = new Uint8ClampedArray(sourceData.length/2).fill(255);
+
+      // This part is really slow >:(
+      console.time('Reprojection');
+      var w = width;
+      var h = height;
+      var x = 0;
+      var y;
+      for (; x < w; x++){
+        for (y = 0; y < h; y++){
+          var pixels = mercator(invert([x, y]));
+          if (!isNaN(pixels[1])){
+            var sourceIndex = 4 * (~~pixels[0] + w * ~~pixels[1]);
+            // Would have been x + w + h if it's not WebGL context
+            // (h-y-1) is to flip the Y (vertical) because WebGL texture starts at the bottom
+            var targetIndex = 4 * (x + w * (h-y-1));
+            targetData[targetIndex] = sourceData[sourceIndex];
+            targetData[targetIndex + 1] = sourceData[sourceIndex + 1];
+            targetData[targetIndex + 2] = sourceData[sourceIndex + 2];
+            // targetData[targetIndex + 3] = 255; // Already filled
+          }
+        }
+      }
+      console.timeEnd('Reprojection');
+
+      // $eMap.width = $eMap.width;
+      var target = context.createImageData(width, halfHeight);
+      target.data.set(targetData);
+
+      // Draw the equirectangular projection canvas
+      context.clearRect(0, 0, $eMap.width, $eMap.height);
+      context.putImageData(target, 0, 0);
+
+      // Cover the North pole
+      for (var y=0; y<halfHeight; y++){
+        var index = y * w * 4;
+        var firstColor = targetData[index];
+        if (firstColor !== 0){
+          var color = 'rgb(' + targetData[index] + ',' + targetData[index+1] + ',' + targetData[index+2] + ')';
+          context.fillStyle = color;
+          context.fillRect(0, 0, w, y);
+          break;
+        }
+      }
+
+      // Cover the South pole
+      for (var y=halfHeight-1; y>=0; --y){
+        var index = y * w * 4;
+        var firstColor = targetData[index];
+        if (firstColor !== 0){
+          var color = 'rgb(' + targetData[index] + ',' + targetData[index+1] + ',' + targetData[index+2] + ')';
+          context.fillStyle = color;
+          context.fillRect(0, y+1, w, halfHeight-y);
+          break;
+        }
+      }
+
+      console.log('Render map end');
+
+      $options.hidden = false;
+      $loader.hidden = true;
+
+      // Set texture on first load
+      if (!material.map){
+        material.map = texture;
+        material.needsUpdate = true;
+        animate();
+      }
+      // Update texture
+      texture.needsUpdate = true;
+
+      map.remove();
+    }, 350); // Delay for the tiles to render properly
+  });
+};
+generateMap('satellite');
+
+$options.ondblclick = $options.ongestureend = function(){
+  document.body.classList.toggle('fullscreen');
+}
+
+// Debugging
+if (DEBUG){
+  document.body.className = 'DEBUG';
+}
+</script>
