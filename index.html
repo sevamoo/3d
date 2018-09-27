@@ -96,7 +96,7 @@ cameraControls.update();
 var _dolly = cameraControls.dolly;
 cameraControls.dolly = function(distance, enableTransition){
   var d = Math.abs(distance);
-  if (d < 2 || d > 60) return;
+  if (d < 18 || d > 60) return;
   _dolly.call(cameraControls, distance, enableTransition);
 }
 
