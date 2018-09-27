@@ -96,7 +96,7 @@ cameraControls.update();
 var _dolly = cameraControls.dolly;
 cameraControls.dolly = function(distance, enableTransition){
   var d = Math.abs(distance);
-  if (d < 18 || d > 60) return;
+  if (d < 2 || d > 60) return;
   _dolly.call(cameraControls, distance, enableTransition);
 }
 
@@ -121,7 +121,7 @@ var cloudMaterial = new THREE.MeshLambertMaterial({
 });
 var cloud = new THREE.Mesh(geometry, cloudMaterial);
 cloud.visible = false;
-(new THREE.TextureLoader()).load('road.png', function(texture){
+(new THREE.TextureLoader()).load('clouds_2048.jpg', function(texture){
   cloudMaterial.alphaMap = texture;
 });
 earth.add(cloud);
