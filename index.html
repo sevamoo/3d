@@ -31,13 +31,15 @@ footer a { color: inherit; }
 <div id="loader">Loading&hellip;</div>
 <div id="options">
   <select id="style-selector" onChange="generateMap(this.value)">
-    <option value="satellite" selected>Satellite</option>
+    <option value="satellite">Satellite</option>
     <option value="streets">Streets</option>
-    <option value="dark">Dark</option>
+    <option value="dark" selected>Dark</option>
     <option value="light">Light</option>
   </select>
   <br>
-  <label><input type="checkbox" id="cloud-checkbox" onChange="toggleClouds(this.checked)"> Clouds</label>
+  <label><input type="checkbox" id="buildings-checkbox" onChange="toggleBuildings(this.checked)"> Buildings</label>
+  
+  <label><input type="checkbox" id="roads-checkbox" onChange="toggleRoads(this.checked)"> roads</label>
 </div>
 <footer>
   <a href="https://github.com/cheeaun/3d-earth" target="_blank">Learn more on GitHub</a>
@@ -116,17 +118,32 @@ scene.add(earth);
 
 // Clouds
 var cloudMaterial = new THREE.MeshLambertMaterial({
-  opacity: 0.8,
+  opacity: 1.00,
   transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'roads.png' )
 });
 var cloud = new THREE.Mesh(geometry, cloudMaterial);
 cloud.visible = false;
-(new THREE.TextureLoader()).load('roads.jpg', function(texture){
-  cloudMaterial.alphaMap = texture;
-});
+
+
+// new THREE.ImageUtils.loadTexture( 'roads.jpg', function(texture){
+
+//   cloudMaterial.map = texture;
+// });
+
+
+//this makes it white
+// (new THREE.TextureLoader()).load('roads.jpg', function(texture){
+
+//   cloudMaterial.alphaMap = texture;
+// });
+
+
+
 earth.add(cloud);
 
-function toggleClouds(checked){
+function toggleRoads(checked){
   cloud.visible = checked;
 };
 
@@ -305,7 +322,7 @@ function generateMap(style){
     }, 350); // Delay for the tiles to render properly
   });
 };
-generateMap('satellite');
+generateMap('dark');
 
 $options.ondblclick = $options.ongestureend = function(){
   document.body.classList.toggle('fullscreen');
