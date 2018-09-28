@@ -121,7 +121,7 @@ var cloudMaterial = new THREE.MeshLambertMaterial({
 });
 var cloud = new THREE.Mesh(geometry, cloudMaterial);
 cloud.visible = false;
-(new THREE.TextureLoader()).load('clouds_2048.jpg', function(texture){
+(new THREE.TextureLoader()).load('roads.jpg', function(texture){
   cloudMaterial.alphaMap = texture;
 });
 earth.add(cloud);
@@ -205,9 +205,9 @@ function generateMap(style){
   var map = new mapboxgl.Map({
     container: 'map',
     // optimize=true -> https://blog.mapbox.com/style-optimized-vector-tiles-39868da81275
-    // style: 'mapbox://styles/mapbox/' + style + '-v9?optimize=true',
+    style: 'mapbox://styles/mapbox/' + style + '-v9?optimize=true',
 
-    style: 'mapbox://styles/sevamoo/cj6dfqqoy0lsi2qpi9e18qsen',
+    // style: 'mapbox://styles/sevamoo/cj6dfqqoy0lsi2qpi9e18qsen',
 
     // style: 'mapbox://styles/sevamoo/cjml03d6rq5dr2rni6izdlioq',
     center: [0, 0],
