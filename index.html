@@ -201,10 +201,12 @@ function generateMap(style){
   $options.hidden = true;
   $loader.hidden = false;
 
+  mapboxgl.accessToken = 'pk.eyJ1Ijoic2V2YW1vbyIsImEiOiJjamUzM2N5ZWQyZms3MnJzNmJtOGprbDlkIn0.fGd1eu_9xugbpQLGemzEvw';
   var map = new mapboxgl.Map({
     container: 'map',
     // optimize=true -> https://blog.mapbox.com/style-optimized-vector-tiles-39868da81275
     // style: 'mapbox://styles/mapbox/' + style + '-v9?optimize=true',
+
     style: 'mapbox://styles/sevamoo/cjml03d6rq5dr2rni6izdlioq',
     center: [0, 0],
     zoom: zoom,
