@@ -51,10 +51,12 @@ footer a { color: inherit; }
 <script src="https://rawgit.com/mrdoob/stats.js/master/build/stats.min.js"></script>
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlZWF1biIsImEiOiJjaXhmb3o3bTEwMDAzMnRudTJuNjh1eXQ1In0.yO6WeKJwx6yIPoVx5aPavQ';
-
-var zoom = 1;
-var mapWidth = 1200 * zoom;
-var mapHeight = 1200 * zoom;
+mapboxgl.accessToken = 'pk.eyJ1Ijoic2V2YW1vbyIsImEiOiJjamUzM2N5ZWQyZms3MnJzNmJtOGprbDlkIn0.fGd1eu_9xugbpQLGemzEvw';
+  
+  
+var zoom = 5.1;
+var mapWidth = 1000 * zoom;
+var mapHeight = 1000 * zoom;
 var DEBUG = location.hash == '#DEBUG';
 
 var $map = document.getElementById('map');
@@ -222,7 +224,9 @@ function generateMap(style){
   var map = new mapboxgl.Map({
     container: 'map',
     // optimize=true -> https://blog.mapbox.com/style-optimized-vector-tiles-39868da81275
-    style: 'mapbox://styles/mapbox/' + style + '-v9?optimize=true',
+    
+    style: 'mapbox://styles/sevamoo/cix65j03d008v2pnw5npbx7qj',
+//     style: 'mapbox://styles/mapbox/' + style + '-v9?optimize=true',
 
     // style: 'mapbox://styles/sevamoo/cj6dfqqoy0lsi2qpi9e18qsen',
 
