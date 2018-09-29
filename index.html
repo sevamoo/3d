@@ -31,7 +31,7 @@ footer a { color: inherit; }
 <div id="loader">Loading&hellip;</div>
 <div id="options">
   <select id="style-selector" onChange="generateMap(this.value)">
-    <option value="satellite">Satellite</option>
+    <!-- <option value="satellite">Satellite</option> -->
     <option value="streets">Streets</option>
     <option value="dark" selected>Dark</option>
     <option value="light">Light</option>
@@ -39,7 +39,8 @@ footer a { color: inherit; }
   <br>
   <label><input type="checkbox" id="buildings-checkbox" onChange="toggleBuildings(this.checked)"> Buildings</label>
   <br>
-  <!-- <label><input type="checkbox" id="roads0-checkbox" onChange="toggleRoads0(this.checked)">roads(kmh<=30)</label>
+  
+ <!--  <label><input type="checkbox" id="roads0-checkbox" onChange="toggleRoads0(this.checked)">roads(kmh<=30)</label>
   <br>
   <label><input type="checkbox" id="roads1-checkbox" onChange="toggleRoads1(this.checked)">roads(30<kmh<=60)</label>
   <br>
@@ -54,7 +55,9 @@ footer a { color: inherit; }
   <label><input type="checkbox" id="city3-checkbox" onChange="toggleCities(this.checked)">Urban Centers</label>
 </div>
 <footer>
-  <a href="https://github.com/cheeaun/3d-earth" target="_blank">Learn more on GitHub</a>
+  <a href="https://www.vahidmoosavi.com" target="_blank"><font size="1">Planetary Urban Density Project by Vahid Moosavi</font></a>
+  <br>
+  <a href="https://github.com/cheeaun/3d-earth" target="_blank"><font size="1">The original webgl framework</font></a>
 </footer>
 <script src="https://api.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-geo/1.6.4/d3-geo.min.js"></script>
