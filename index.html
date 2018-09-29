@@ -38,8 +38,20 @@ footer a { color: inherit; }
   </select>
   <br>
   <label><input type="checkbox" id="buildings-checkbox" onChange="toggleBuildings(this.checked)"> Buildings</label>
-  
-  <label><input type="checkbox" id="roads-checkbox" onChange="toggleRoads(this.checked)"> roads</label>
+  <br>
+  <!-- <label><input type="checkbox" id="roads0-checkbox" onChange="toggleRoads0(this.checked)">roads(kmh<=30)</label>
+  <br>
+  <label><input type="checkbox" id="roads1-checkbox" onChange="toggleRoads1(this.checked)">roads(30<kmh<=60)</label>
+  <br>
+  <label><input type="checkbox" id="roads2-checkbox" onChange="toggleRoads2(this.checked)">roads(60<kmh<=100)</label>
+  <br>
+  <label><input type="checkbox" id="roads3-checkbox" onChange="toggleRoads3(this.checked)">roads(100<kmh<=120)</label>
+  <br>
+  <label><input type="checkbox" id="roads4-checkbox" onChange="toggleRoads4(this.checked)">roads(kmh>120)</label>
+  <br> -->
+  <label><input type="checkbox" id="roads5-checkbox" onChange="toggleRoads5(this.checked)">Roads</label>
+  <br>
+  <label><input type="checkbox" id="city3-checkbox" onChange="toggleCities(this.checked)">Urban Centers</label>
 </div>
 <footer>
   <a href="https://github.com/cheeaun/3d-earth" target="_blank">Learn more on GitHub</a>
@@ -51,10 +63,8 @@ footer a { color: inherit; }
 <script src="https://rawgit.com/mrdoob/stats.js/master/build/stats.min.js"></script>
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlZWF1biIsImEiOiJjaXhmb3o3bTEwMDAzMnRudTJuNjh1eXQ1In0.yO6WeKJwx6yIPoVx5aPavQ';
-// mapboxgl.accessToken = 'pk.eyJ1Ijoic2V2YW1vbyIsImEiOiJjamUzM2N5ZWQyZms3MnJzNmJtOGprbDlkIn0.fGd1eu_9xugbpQLGemzEvw';
-  
-  
-var zoom = 1;
+
+var zoom =1;
 var mapWidth = 1200 * zoom;
 var mapHeight = 1200 * zoom;
 var DEBUG = location.hash == '#DEBUG';
@@ -100,7 +110,7 @@ cameraControls.update();
 var _dolly = cameraControls.dolly;
 cameraControls.dolly = function(distance, enableTransition){
   var d = Math.abs(distance);
-  if (d < 18 || d > 60) return;
+  if (d < 12 || d > 60) return;
   _dolly.call(cameraControls, distance, enableTransition);
 }
 
@@ -118,36 +128,165 @@ var material = new THREE.MeshPhongMaterial({
 var earth = new THREE.Mesh(geometry, material);
 scene.add(earth);
 
-// Clouds
-var cloudMaterial = new THREE.MeshLambertMaterial({
+
+
+
+
+// Roads0
+var roads0Material = new THREE.MeshLambertMaterial({
   opacity: 1.00,
   transparent: true,
   // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
-  map: THREE.ImageUtils.loadTexture( 'test1.png' )
+  map: THREE.ImageUtils.loadTexture( 'roads0.png' )
 });
-var cloud = new THREE.Mesh(geometry, cloudMaterial);
-cloud.visible = false;
+var roads0 = new THREE.Mesh(geometry, roads0Material);
+roads0.visible = false;
 
 
-// new THREE.ImageUtils.loadTexture( 'roads.jpg', function(texture){
+earth.add(roads0);
 
-//   cloudMaterial.map = texture;
-// });
-
-
-//this makes it white
-// (new THREE.TextureLoader()).load('roads.jpg', function(texture){
-
-//   cloudMaterial.alphaMap = texture;
-// });
-
-
-
-earth.add(cloud);
-
-function toggleRoads(checked){
-  cloud.visible = checked;
+function toggleRoads0(checked){
+  roads0.visible = checked;
 };
+
+
+
+// Roads1
+var roads1Material = new THREE.MeshLambertMaterial({
+  opacity: 1.00,
+  transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'roads1.png' )
+});
+var roads1 = new THREE.Mesh(geometry, roads1Material);
+roads1.visible = false;
+
+
+earth.add(roads1);
+
+function toggleRoads1(checked){
+  roads1.visible = checked;
+};
+
+
+
+// Roads2
+var roads2Material = new THREE.MeshLambertMaterial({
+  opacity: 1.00,
+  transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'roads2.png' )
+});
+var roads2 = new THREE.Mesh(geometry, roads2Material);
+roads2.visible = false;
+
+
+earth.add(roads2);
+
+function toggleRoads2(checked){
+  roads2.visible = checked;
+};
+
+
+// Roads3
+var roads3Material = new THREE.MeshLambertMaterial({
+  opacity: 1.00,
+  transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'roads3.png' )
+});
+var roads3 = new THREE.Mesh(geometry, roads3Material);
+roads3.visible = false;
+
+
+earth.add(roads3);
+
+function toggleRoads3(checked){
+  roads3.visible = checked;
+};
+
+
+// Roads4
+var roads4Material = new THREE.MeshLambertMaterial({
+  opacity: 1.00,
+  transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'roads4.png' )
+});
+var roads4 = new THREE.Mesh(geometry, roads4Material);
+roads4.visible = false;
+
+
+earth.add(roads4);
+
+function toggleRoads4(checked){
+  roads4.visible = checked;
+};
+
+
+// Roads5
+var roads5Material = new THREE.MeshLambertMaterial({
+  opacity: 1.00,
+  transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'roads5.png' )
+});
+var roads5 = new THREE.Mesh(geometry, roads5Material);
+roads5.visible = false;
+
+
+earth.add(roads5);
+
+function toggleRoads5(checked){
+  roads5.visible = checked;
+};
+
+
+
+
+
+
+
+//Buildings
+var buildingsMaterial = new THREE.MeshLambertMaterial({
+  opacity: 1.00,
+  transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'buildings4.png' )
+});
+var buildings = new THREE.Mesh(geometry, buildingsMaterial);
+buildings.visible = false;
+
+
+earth.add(buildings);
+
+function toggleBuildings(checked){
+  buildings.visible = checked;
+};
+
+
+
+//Urban centers
+var citiesMaterial = new THREE.MeshLambertMaterial({
+  opacity: 1.00,
+  transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'city3.png' )
+});
+var cities = new THREE.Mesh(geometry, citiesMaterial);
+cities.visible = false;
+
+
+earth.add(cities);
+
+function toggleCities(checked){
+  cities.visible = checked;
+};
+
+
+
+
+
 
 // Stars
 var starsGeometry = new THREE.SphereGeometry(1000);
@@ -224,8 +363,6 @@ function generateMap(style){
   var map = new mapboxgl.Map({
     container: 'map',
     // optimize=true -> https://blog.mapbox.com/style-optimized-vector-tiles-39868da81275
-//     style: 'mapbox://styles/sevamoo/cj6dfqqoy0lsi2qpi9e18qsen',
-//     style: 'mapbox://styles/sevamoo/cix65j03d008v2pnw5npbx7qj',
     style: 'mapbox://styles/mapbox/' + style + '-v9?optimize=true',
 
     // style: 'mapbox://styles/sevamoo/cj6dfqqoy0lsi2qpi9e18qsen',
