@@ -39,7 +39,7 @@ footer a { color: inherit; }
   <br>
   <label><input type="checkbox" id="buildings-checkbox" onChange="toggleBuildings(this.checked)"> Buildings</label>
   <br>
-  
+
  <!--  <label><input type="checkbox" id="roads0-checkbox" onChange="toggleRoads0(this.checked)">roads(kmh<=30)</label>
   <br>
   <label><input type="checkbox" id="roads1-checkbox" onChange="toggleRoads1(this.checked)">roads(30<kmh<=60)</label>
@@ -53,6 +53,8 @@ footer a { color: inherit; }
   <label><input type="checkbox" id="roads5-checkbox" onChange="toggleRoads5(this.checked)">Roads</label>
   <br>
   <label><input type="checkbox" id="city3-checkbox" onChange="toggleCities(this.checked)">Urban Centers</label>
+  <br>
+  <label><input type="checkbox" id="UHI-checkbox" onChange="toggleUHI(this.checked)">Urban Heat Islands</label>
 </div>
 <footer>
   <a href="https://www.vahidmoosavi.com" target="_blank"><font size="1">Planetary Urban Density Project by Vahid Moosavi</font></a>
@@ -66,6 +68,7 @@ footer a { color: inherit; }
 <script src="https://rawgit.com/mrdoob/stats.js/master/build/stats.min.js"></script>
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlZWF1biIsImEiOiJjaXhmb3o3bTEwMDAzMnRudTJuNjh1eXQ1In0.yO6WeKJwx6yIPoVx5aPavQ';
+// mapboxgl.accessToken = 'pk.eyJ1Ijoic2V2YW1vbyIsImEiOiJjamUzM2N5ZWQyZms3MnJzNmJtOGprbDlkIn0.fGd1eu_9xugbpQLGemzEvw';
 
 var zoom =1;
 var mapWidth = 1200 * zoom;
@@ -270,11 +273,16 @@ function toggleBuildings(checked){
 
 
 //Urban centers
+
+// var texture = new THREE.TextureLoader().load( 'city.png' );
+
 var citiesMaterial = new THREE.MeshLambertMaterial({
   opacity: 1.00,
   transparent: true,
   // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
-  map: THREE.ImageUtils.loadTexture( 'city3.png' )
+  map: THREE.ImageUtils.loadTexture( 'centers_all_.png' )
+
+  // map: texture
 });
 var cities = new THREE.Mesh(geometry, citiesMaterial);
 cities.visible = false;
@@ -284,6 +292,30 @@ earth.add(cities);
 
 function toggleCities(checked){
   cities.visible = checked;
+};
+
+
+
+//Urban Heat Island
+
+// var texture = new THREE.TextureLoader().load( 'city.png' );
+
+var UHIMaterial = new THREE.MeshLambertMaterial({
+  opacity: 1.00,
+  transparent: true,
+  // alphaMap: THREE.ImageUtils.loadTexture( 'roads.jpg' )
+  map: THREE.ImageUtils.loadTexture( 'UHI_D_T_DIFF_.png' )
+
+  // map: texture
+});
+var UHI = new THREE.Mesh(geometry, UHIMaterial);
+UHI.visible = false;
+
+
+earth.add(UHI);
+
+function toggleUHI(checked){
+  UHI.visible = checked;
 };
 
 
@@ -367,7 +399,7 @@ function generateMap(style){
     container: 'map',
     // optimize=true -> https://blog.mapbox.com/style-optimized-vector-tiles-39868da81275
     style: 'mapbox://styles/mapbox/' + style + '-v9?optimize=true',
-
+    // styel: 'mapbox://styles/sevamoo/cjmrogwk03xnz2spgpuj24gk6',
     // style: 'mapbox://styles/sevamoo/cj6dfqqoy0lsi2qpi9e18qsen',
 
     // style: 'mapbox://styles/sevamoo/cjml03d6rq5dr2rni6izdlioq',
